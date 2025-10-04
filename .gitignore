@@ -1,0 +1,25 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+storybook-static
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Test coverage
+coverage
+
+# Environment variables
+.env
+.env.local
