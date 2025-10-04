@@ -7,24 +7,6 @@ import {
   setCachedFonts,
 } from './fonts'
 
-export interface UsePictureInPictureOptions {
-  width?: number
-  height?: number
-  onEnter?: () => void
-  onLeave?: () => void
-}
-
-export interface UsePictureInPictureReturn {
-  isSupported: boolean
-  isPiPActive: boolean
-  videoRef: React.RefObject<HTMLVideoElement>
-  canvasRef: React.RefObject<HTMLCanvasElement>
-  enter: () => Promise<void>
-  exit: () => Promise<void>
-  toggle: () => Promise<void>
-  updateCanvas: (updateFn: (ctx: CanvasRenderingContext2D) => void) => void
-}
-
 export interface UsePinPOptions {
   element: ReactNode
   width?: number

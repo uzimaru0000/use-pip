@@ -5,8 +5,6 @@ export { usePinP } from './hooks'
 export type {
   UsePinPOptions,
   UsePinPReturn,
-  UsePictureInPictureOptions,
-  UsePictureInPictureReturn,
 } from './hooks'
 
 export {
