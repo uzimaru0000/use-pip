@@ -1,10 +1,18 @@
 {
   "name": "use-pip",
   "version": "0.0.1",
-  "description": "React Hooks library",
+  "description": "React Hook for Picture-in-Picture with JSX rendering via Satori",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uzimaru0000/use-pip.git"
+  },
+  "homepage": "https://github.com/uzimaru0000/use-pip#readme",
+  "bugs": {
+    "url": "https://github.com/uzimaru0000/use-pip/issues"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
