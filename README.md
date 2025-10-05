@@ -1,4 +1,4 @@
-# use-pip
+# @uzimaru0000/use-pip
 
 React Hook for Picture-in-Picture with JSX rendering via [Satori](https://github.com/vercel/satori).
 
@@ -12,7 +12,7 @@ React Hook for Picture-in-Picture with JSX rendering via [Satori](https://github
 ## Installation
 
 ```bash
-npm install use-pip
+npm install @uzimaru0000/use-pip
 ```
 
 ## Usage
@@ -20,7 +20,7 @@ npm install use-pip
 ### Basic Example
 
 ```tsx
-import { usePinP } from 'use-pip';
+import { usePinP } from '@uzimaru0000/use-pip';
 import type { SatoriOptions } from 'satori';
 
 // Define a font resolver
@@ -102,7 +102,7 @@ function App() {
 ### Using Font Cache
 
 ```tsx
-import { setCachedFonts, getCachedFonts, clearFontCache } from 'use-pip';
+import { setCachedFonts, getCachedFonts, clearFontCache } from '@uzimaru0000/use-pip';
 
 // Set fonts to cache
 setCachedFonts('my-fonts', fonts);
