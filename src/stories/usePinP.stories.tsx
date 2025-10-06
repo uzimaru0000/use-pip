@@ -1,21 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import React from 'react';
-import type { SatoriOptions } from 'satori';
-import { usePinP } from '..';
+import React, { useEffect, useState } from 'react';
+import { type Font, type UnresolvedFont, usePinP } from '..';
 
 // Font resolver that loads Google Fonts from fontsource CDN (TTF format)
 // Google Fonts API only returns WOFF2 which Satori doesn't support,
 // so we use fontsource which provides TTF files
-const loadGoogleFont = async ({
-  family,
-  weight = 400,
-}: {
-  family: string;
-  weight?: SatoriOptions['fonts'][number]['weight'];
-}): Promise<SatoriOptions['fonts']> => {
+const loadGoogleFont = async (opts: UnresolvedFont): Promise<Font> => {
+  const { name, weight } = opts;
   // Convert font family name to fontsource package name
   // e.g., "Noto Sans JP" -> "noto-sans-jp"
-  const packageName = family.toLowerCase().replace(/\s+/g, '-');
+  const packageName = name.toLowerCase().replace(/\s+/g, '-');
 
   // Determine subset and weight string
   const subset = packageName.includes('jp') ? 'japanese' : 'latin';
@@ -27,30 +21,25 @@ const loadGoogleFont = async ({
   const fontResponse = await fetch(fontUrl);
 
   if (!fontResponse.ok) {
-    throw new Error(`Failed to fetch font: ${fontResponse.statusText}. URL: ${fontUrl}`);
+    throw new Error(
+      `Failed to fetch font: ${fontResponse.statusText}. URL: ${fontUrl}`,
+    );
   }
 
   const data = await fontResponse.arrayBuffer();
 
-  return [
-    {
-      name: family,
-      data,
-      weight,
-      style: 'normal' as const,
-    },
-  ];
-};
+  console.log('Loaded font:', fontUrl);
 
-const fontResolver = async () => {
-  return loadGoogleFont({
-    family: 'Noto Sans JP',
-    weight: 400,
-  });
+  return {
+    ...opts,
+    data,
+  };
 };
 
 // Component wrapper for the hook
 const PiPExample = () => {
+  const [timer, setTimer] = useState(0);
+
   const { toggle, active, isSupported } = usePinP({
     element: (
       <div
@@ -66,14 +55,28 @@ const PiPExample = () => {
           fontFamily: 'sans-serif',
         }}
       >
-        Picture-in-Picture Demo
+        Picture-in-Picture Demo {timer}
       </div>
     ),
     width: 640,
     height: 480,
-    fontResolver,
-    fontCacheKey: 'default',
+    fonts: [
+      {
+        name: 'Noto Sans JP',
+        weight: 400,
+      },
+    ],
+    fontResolver: loadGoogleFont,
   });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimer((prev) => prev + 1);
+    }, 1000);
+    setTimer(0);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div style={{ padding: '20px' }}>
@@ -84,6 +87,7 @@ const PiPExample = () => {
           : 'Picture-in-Picture is not supported in your browser'}
       </p>
       <button
+        type="button"
         onClick={toggle}
         disabled={!isSupported}
         style={{
