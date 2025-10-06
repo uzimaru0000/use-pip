@@ -71,12 +71,19 @@ const PiPExample = ({ debug }: { debug: boolean }) => {
   });
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    let frameId: number | null = null;
+    const loop = () => {
       setTimer((prev) => prev + 1);
-    }, 1000);
-    setTimer(0);
+      frameId = requestAnimationFrame(loop);
+    }
 
-    return () => clearInterval(interval);
+    loop();
+
+    return () => {
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+      }
+    }
   }, []);
 
   return (

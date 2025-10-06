@@ -119,7 +119,7 @@ export const usePinP = ({
     const canvas = canvasRef.current;
     const video = videoRef.current;
     if (canvas && video && !streamRef.current) {
-      const stream = canvas.captureStream();
+      const stream = canvas.captureStream(0);
       streamRef.current = stream;
       video.srcObject = stream;
       video.load();
@@ -188,6 +188,13 @@ export const usePinP = ({
           height,
           fonts: resolvedFonts,
         });
+        
+        if (streamRef.current) {
+          const track = streamRef.current?.getVideoTracks()[0];
+          if (track && track instanceof CanvasCaptureMediaStreamTrack) {
+            track.requestFrame()
+          }
+        }
       } catch (error) {
         console.error('Failed to render to canvas:', error);
       }
