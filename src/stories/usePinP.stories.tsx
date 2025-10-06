@@ -37,7 +37,7 @@ const loadGoogleFont = async (opts: UnresolvedFont): Promise<Font> => {
 };
 
 // Component wrapper for the hook
-const PiPExample = () => {
+const PiPExample = ({ debug }: { debug: boolean }) => {
   const [timer, setTimer] = useState(0);
 
   const { toggle, active, isSupported } = usePinP({
@@ -67,6 +67,7 @@ const PiPExample = () => {
       },
     ],
     fontResolver: loadGoogleFont,
+    debug,
   });
 
   useEffect(() => {
@@ -121,4 +122,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  args: {
+    debug: false,
+  },
+};

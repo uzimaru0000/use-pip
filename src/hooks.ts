@@ -5,14 +5,13 @@ import {
   useRef,
   useState,
 } from 'react';
-import type { SatoriOptions } from 'satori';
 import { renderToCanvas } from './satoriRenderer';
 import {
-  Font,
+  type Font,
   type FontResolver,
   getCachedFonts,
   setCachedFonts,
-  UnresolvedFont,
+  type UnresolvedFont,
 } from './fonts';
 
 export type UsePinPOptions = {
@@ -21,6 +20,7 @@ export type UsePinPOptions = {
   height?: number;
   onEnter?: () => void;
   onLeave?: () => void;
+  debug?: boolean;
 } & (
   | {
       fonts: Font[];
@@ -62,6 +62,7 @@ export const usePinP = ({
   height = 480,
   onEnter,
   onLeave,
+  debug = false,
   ...fontOptions
 }: UsePinPOptions): UsePinPReturn => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -103,6 +104,15 @@ export const usePinP = ({
       canvas.style.height = `${height}px`;
       document.body.appendChild(canvas);
       canvasRef.current = canvas;
+
+      if (debug) {
+        canvas.style.display = 'block';
+        canvas.style.position = 'absolute';
+        canvas.style.left = '0';
+        canvas.style.bottom = '0';
+        canvas.style.zIndex = '1000';
+        canvas.style.border = '1px solid red';
+      }
     }
 
     // Initialize stream early
@@ -131,7 +141,7 @@ export const usePinP = ({
         streamRef.current = null;
       }
     };
-  }, [width, height]);
+  }, [width, height, debug]);
 
   // Render canvas when element changes
   useEffect(() => {
