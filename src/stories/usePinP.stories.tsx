@@ -58,8 +58,8 @@ const PiPExample = ({ debug }: { debug: boolean }) => {
         Picture-in-Picture Demo {timer}
       </div>
     ),
-    width: 640,
-    height: 480,
+    width: 947,
+    height: 521,
     fonts: [
       {
         name: 'Noto Sans JP',
@@ -75,7 +75,7 @@ const PiPExample = ({ debug }: { debug: boolean }) => {
     const loop = () => {
       setTimer((prev) => prev + 1);
       frameId = requestAnimationFrame(loop);
-    }
+    };
 
     loop();
 
@@ -83,7 +83,7 @@ const PiPExample = ({ debug }: { debug: boolean }) => {
       if (frameId) {
         cancelAnimationFrame(frameId);
       }
-    }
+    };
   }, []);
 
   return (
