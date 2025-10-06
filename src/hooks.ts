@@ -5,7 +5,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { renderToCanvas } from './satoriRenderer';
 import {
   type Font,
   type FontResolver,
@@ -13,6 +12,7 @@ import {
   setCachedFonts,
   type UnresolvedFont,
 } from './fonts';
+import { renderToCanvas } from './satoriRenderer';
 
 export type UsePinPOptions = {
   element: ReactNode;
