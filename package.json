@@ -1,6 +1,6 @@
 {
   "name": "@uzimaru0000/use-pip",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "React Hook for Picture-in-Picture with JSX rendering via Satori",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
