@@ -62,6 +62,7 @@ export type UsePinPOptions = {
   onEnter?: () => void;
   onLeave?: () => void;
   debug?: boolean;
+  audioDestination?: MediaStreamAudioDestinationNode;
 } & (
   | {
       fonts: Font[];
@@ -104,6 +105,7 @@ export const usePinP = ({
   onEnter,
   onLeave,
   debug = false,
+  audioDestination,
   ...fontOptions
 }: UsePinPOptions): UsePinPReturn => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -166,6 +168,7 @@ export const usePinP = ({
     const video = videoRef.current;
     if (canvas && video && !streamRef.current) {
       const stream = canvas.captureStream(0);
+
       streamRef.current = stream;
       video.srcObject = stream;
       video.load();
@@ -188,6 +191,33 @@ export const usePinP = ({
       }
     };
   }, [width, height, debug]);
+
+  // Handle dynamic audio destination changes
+  useEffect(() => {
+    const stream = streamRef.current;
+    if (!stream) {
+      return;
+    }
+
+    if (videoRef.current) {
+      videoRef.current.muted = false;
+      videoRef.current.volume = 1;
+    }
+
+    // Remove all existing audio tracks
+    const existingAudioTracks = stream.getAudioTracks();
+    for (const track of existingAudioTracks) {
+      stream.removeTrack(track);
+    }
+
+    // Add new audio tracks if audioDestination is provided
+    if (audioDestination) {
+      const audioTracks = audioDestination.stream.getAudioTracks();
+      for (const track of audioTracks) {
+        stream.addTrack(track);
+      }
+    }
+  }, [audioDestination]);
 
   // Render canvas when element changes
   useEffect(() => {
@@ -267,6 +297,9 @@ export const usePinP = ({
 
     const handleLeavePiP = () => {
       setIsPiPActive(false);
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
       onLeave?.();
     };
 
