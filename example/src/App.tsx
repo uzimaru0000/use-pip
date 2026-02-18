@@ -1,9 +1,5 @@
+import { type Font, type UnresolvedFont, usePinP } from '@uzimaru0000/use-pip';
 import { useEffect, useState } from 'react';
-import {
-  type Font,
-  type UnresolvedFont,
-  usePinP,
-} from '@uzimaru0000/use-pip';
 
 const loadGoogleFont = async (opts: UnresolvedFont): Promise<Font> => {
   const { name, weight } = opts;
@@ -62,7 +58,13 @@ function BasicDemo() {
   }, []);
 
   return (
-    <div style={{ padding: '24px', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+    <div
+      style={{
+        padding: '24px',
+        border: '1px solid #e2e8f0',
+        borderRadius: '12px',
+      }}
+    >
       <h2 style={{ margin: '0 0 8px' }}>Basic</h2>
       <p style={{ margin: '0 0 16px', color: '#64748b' }}>
         JSX to PiP rendering with a live counter.
@@ -111,9 +113,8 @@ function AudioDemo() {
     const update = () => {
       analyser.getByteTimeDomainData(dataArray);
       const step = Math.floor(dataArray.length / BAR_COUNT);
-      const bars = Array.from(
-        { length: BAR_COUNT },
-        (_, i) => Math.min(1, (Math.abs(dataArray[i * step] - 128) / 128) * 4),
+      const bars = Array.from({ length: BAR_COUNT }, (_, i) =>
+        Math.min(1, (Math.abs(dataArray[i * step] - 128) / 128) * 4),
       );
       setWaveform(bars);
       id = setTimeout(update, 100);
@@ -200,7 +201,13 @@ function AudioDemo() {
   };
 
   return (
-    <div style={{ padding: '24px', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+    <div
+      style={{
+        padding: '24px',
+        border: '1px solid #e2e8f0',
+        borderRadius: '12px',
+      }}
+    >
       <h2 style={{ margin: '0 0 8px' }}>With Audio</h2>
       <p style={{ margin: '0 0 16px', color: '#64748b' }}>
         PiP window with audio output (440Hz sine wave).
@@ -252,7 +259,14 @@ export function App() {
         <BasicDemo />
         <AudioDemo />
       </div>
-      <p style={{ marginTop: '48px', fontSize: '14px', color: '#94a3b8', textAlign: 'center' }}>
+      <p
+        style={{
+          marginTop: '48px',
+          fontSize: '14px',
+          color: '#94a3b8',
+          textAlign: 'center',
+        }}
+      >
         <a
           href="https://github.com/uzimaru0000/use-pip"
           style={{ color: '#2563eb' }}

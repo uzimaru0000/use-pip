@@ -9,6 +9,7 @@ export interface SatoriRendererOptions {
 export interface RenderToCanvasOptions extends SatoriRendererOptions {
   element: React.ReactNode;
   canvas: HTMLCanvasElement;
+  devicePixelRatio?: number;
 }
 
 /**
@@ -63,22 +64,50 @@ export const drawImageToCanvas = (
 };
 
 /**
+ * Scale SVG width/height attributes by a given factor while preserving viewBox.
+ * This causes the browser to rasterize the SVG at a higher resolution for HiDPI displays.
+ */
+export const scaleSvgDimensions = (svg: string, scale: number): string => {
+  if (scale === 1) return svg;
+  return svg
+    .replace(
+      /(<svg\b[^>]*\b)width="(\d+(?:\.\d+)?)"/,
+      (_, prefix, w) => `${prefix}width="${Math.round(Number(w) * scale)}"`,
+    )
+    .replace(
+      /(<svg\b[^>]*\b)height="(\d+(?:\.\d+)?)"/,
+      (_, prefix, h) => `${prefix}height="${Math.round(Number(h) * scale)}"`,
+    );
+};
+
+/**
  * Render JSX element to canvas using Satori
  */
 export const renderToCanvas = async (
   options: RenderToCanvasOptions,
 ): Promise<void> => {
-  const { element, canvas, ...satoriOptions } = options;
+  const {
+    element,
+    canvas,
+    devicePixelRatio: dprOption,
+    ...satoriOptions
+  } = options;
+  const dpr =
+    dprOption ??
+    (typeof window !== 'undefined' ? (window.devicePixelRatio ?? 1) : 1);
 
-  // Set canvas dimensions
-  canvas.width = satoriOptions.width;
-  canvas.height = satoriOptions.height;
+  // Set canvas dimensions to physical pixel size
+  canvas.width = Math.round(satoriOptions.width * dpr);
+  canvas.height = Math.round(satoriOptions.height * dpr);
 
-  // Convert JSX to SVG
+  // Convert JSX to SVG at logical dimensions (preserves layout)
   const svg = await renderToSVG(element, satoriOptions);
 
-  // Convert SVG to Image
-  const image = await svgToImage(svg);
+  // Scale SVG viewport for high-resolution rasterization
+  const scaledSvg = scaleSvgDimensions(svg, dpr);
+
+  // Convert SVG to Image (decoded at physical resolution)
+  const image = await svgToImage(scaledSvg);
 
   // Draw to canvas
   drawImageToCanvas(image, canvas);

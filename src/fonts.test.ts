@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { setCachedFonts, getCachedFonts, clearFontCache } from './fonts';
+import { beforeEach, describe, expect, it } from 'vitest';
 import type { Font } from './fonts';
+import { clearFontCache, getCachedFonts, setCachedFonts } from './fonts';
 
 const makeFont = (name: string): Font => ({
   name,
