@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('satori', () => ({
   default: vi.fn(),
@@ -7,16 +7,20 @@ vi.mock('satori', () => ({
 
 import satori from 'satori';
 import {
-  renderToSVG,
-  svgToImage,
   drawImageToCanvas,
   renderToCanvas,
+  renderToSVG,
+  scaleSvgDimensions,
+  svgToImage,
 } from './satoriRenderer';
 
 const mockedSatori = vi.mocked(satori);
 
 const STUB_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg"><text>hello</text></svg>';
+
+const SATORI_STYLE_SVG =
+  '<svg width="640" height="480" viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg"><text>hello</text></svg>';
 
 const makeFonts = () => [
   {
@@ -120,8 +124,32 @@ describe('satoriRenderer', () => {
     });
   });
 
+  describe('scaleSvgDimensions', () => {
+    it('returns svg unchanged when scale is 1', () => {
+      expect(scaleSvgDimensions(SATORI_STYLE_SVG, 1)).toBe(SATORI_STYLE_SVG);
+    });
+
+    it('scales width and height attributes by the given factor', () => {
+      const result = scaleSvgDimensions(SATORI_STYLE_SVG, 2);
+      expect(result).toContain('width="1280"');
+      expect(result).toContain('height="960"');
+      expect(result).toContain('viewBox="0 0 640 480"');
+    });
+
+    it('handles non-integer scale factors with rounding', () => {
+      const result = scaleSvgDimensions(SATORI_STYLE_SVG, 1.5);
+      expect(result).toContain('width="960"');
+      expect(result).toContain('height="720"');
+      expect(result).toContain('viewBox="0 0 640 480"');
+    });
+
+    it('returns svg unchanged when no width/height attributes exist', () => {
+      expect(scaleSvgDimensions(STUB_SVG, 2)).toBe(STUB_SVG);
+    });
+  });
+
   describe('renderToCanvas', () => {
-    it('orchestrates the full pipeline', async () => {
+    it('orchestrates the full pipeline at dpr=1', async () => {
       const fakeUrl = 'blob:pipeline-test';
       vi.spyOn(URL, 'createObjectURL').mockReturnValue(fakeUrl);
       vi.spyOn(URL, 'revokeObjectURL').mockReturnValue(undefined);
@@ -141,11 +169,46 @@ describe('satoriRenderer', () => {
         width: 300,
         height: 150,
         fonts: makeFonts(),
+        devicePixelRatio: 1,
       });
 
       expect(mockedSatori).toHaveBeenCalledOnce();
       expect(canvas.width).toBe(300);
       expect(canvas.height).toBe(150);
+      expect(drawImageFn).toHaveBeenCalledOnce();
+    });
+
+    it('scales canvas dimensions by dpr=2', async () => {
+      mockedSatori.mockResolvedValue(SATORI_STYLE_SVG);
+      const fakeUrl = 'blob:dpr-test';
+      vi.spyOn(URL, 'createObjectURL').mockReturnValue(fakeUrl);
+      vi.spyOn(URL, 'revokeObjectURL').mockReturnValue(undefined);
+      vi.spyOn(HTMLImageElement.prototype, 'decode').mockResolvedValue(
+        undefined,
+      );
+
+      const drawImageFn = vi.fn();
+      const canvas = document.createElement('canvas');
+      vi.spyOn(canvas, 'getContext').mockReturnValue({
+        drawImage: drawImageFn,
+      } as unknown as CanvasRenderingContext2D);
+
+      await renderToCanvas({
+        element: null,
+        canvas,
+        width: 300,
+        height: 150,
+        fonts: makeFonts(),
+        devicePixelRatio: 2,
+      });
+
+      expect(mockedSatori).toHaveBeenCalledWith(null, {
+        width: 300,
+        height: 150,
+        fonts: makeFonts(),
+      });
+      expect(canvas.width).toBe(600);
+      expect(canvas.height).toBe(300);
       expect(drawImageFn).toHaveBeenCalledOnce();
     });
   });

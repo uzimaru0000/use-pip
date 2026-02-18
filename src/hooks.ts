@@ -23,6 +23,7 @@ export type UsePinPOptions = {
   onLeave?: () => void;
   debug?: boolean;
   audioDestination?: MediaStreamAudioDestinationNode;
+  devicePixelRatio?: number;
 } & (
   | {
       fonts: Font[];
@@ -66,8 +67,12 @@ export const usePinP = ({
   onLeave,
   debug = false,
   audioDestination,
+  devicePixelRatio: dprOption,
   ...fontOptions
 }: UsePinPOptions): UsePinPReturn => {
+  const dpr =
+    dprOption ??
+    (typeof window !== 'undefined' ? (window.devicePixelRatio ?? 1) : 1);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -105,8 +110,8 @@ export const usePinP = ({
 
     if (!canvasRef.current) {
       const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
       canvas.style.display = 'none';
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
@@ -150,7 +155,7 @@ export const usePinP = ({
         streamRef.current = null;
       }
     };
-  }, [width, height, debug]);
+  }, [width, height, dpr, debug]);
 
   // Handle dynamic audio destination changes
   useEffect(() => {
@@ -223,6 +228,7 @@ export const usePinP = ({
           width,
           height,
           fonts: resolvedFonts,
+          devicePixelRatio: dpr,
         });
 
         if (streamRef.current) {
@@ -241,7 +247,14 @@ export const usePinP = ({
     return () => {
       cancelled = true;
     };
-  }, [element, width, height, fontOptions.fontResolver, fontOptions.fonts]);
+  }, [
+    element,
+    width,
+    height,
+    dpr,
+    fontOptions.fontResolver,
+    fontOptions.fonts,
+  ]);
 
   // Setup PiP event listeners
   useEffect(() => {
